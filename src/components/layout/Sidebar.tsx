@@ -100,7 +100,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-4">
-        {NAV.map((group) => (
+        {visibleNav.map((group) => (
           <div key={group.label} className="mt-6 first:mt-2">
             <div className="px-3 pb-2 text-[10px] uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-medium">
               {group.label}
