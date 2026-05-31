@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 const OFFER_TYPES: { value: OfferType; label: string }[] = [
   { value: "simple_price", label: "Preço Simples" },
   { value: "de_por", label: "DE / POR" },
+  { value: "this_package", label: "Esta Embalagem" },
   { value: "take_x_pay_y", label: "Leve X Pague Y" },
   { value: "app_price", label: "Preço App" },
   { value: "combo", label: "Combo" },
