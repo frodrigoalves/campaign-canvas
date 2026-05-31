@@ -8,13 +8,9 @@ import {
   AlertTriangle,
   ArrowRight,
   CheckCircle,
-  ChevronDown,
-  ChevronUp,
   Clock,
-  ImagePlus,
   Loader2,
   Minus,
-  RefreshCw,
   Search,
   TrendingDown,
   TrendingUp,
@@ -27,6 +23,9 @@ import { mockCampaigns } from "@/lib/mocks/campaigns";
 import type { ProductWithCommercial, OfferType, PmzCalcResult } from "@/types/product.types";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
+import { NovoPMZCard } from "./components/NovoPMZCard";
+import { LivePreviewPanel } from "./components/LivePreviewPanel";
+import { MarketIntelPanel } from "./components/MarketIntelPanel";
 
 const OFFER_TYPES: { value: OfferType; label: string }[] = [
   { value: "simple_price", label: "Preço Simples" },
