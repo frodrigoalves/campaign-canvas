@@ -29,7 +29,7 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: "cevaroli.auth",
       storage: createJSONStorage(() =>
-        typeof window !== "undefined" ? window.localStorage : (noopStorage as Storage),
+        typeof window !== "undefined" ? window.localStorage : (noopStorage as unknown as Storage),
       ),
       skipHydration: true,
     },
