@@ -67,8 +67,14 @@ const NAV: NavGroup[] = [
 export function Sidebar() {
   const user = useAuthStore((s) => s.user);
   const clear = useAuthStore((s) => s.clear);
+  const { can } = usePermission();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const visibleNav = NAV.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => !item.permission || item.permission === "*" || can(item.permission)),
+  })).filter((group) => group.items.length > 0);
 
   const initials = (user?.name ?? "??")
     .split(" ")
