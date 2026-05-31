@@ -8,13 +8,9 @@ import {
   AlertTriangle,
   ArrowRight,
   CheckCircle,
-  ChevronDown,
-  ChevronUp,
   Clock,
-  ImagePlus,
   Loader2,
   Minus,
-  RefreshCw,
   Search,
   TrendingDown,
   TrendingUp,
@@ -27,6 +23,9 @@ import { mockCampaigns } from "@/lib/mocks/campaigns";
 import type { ProductWithCommercial, OfferType, PmzCalcResult } from "@/types/product.types";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
+import { NovoPMZCard } from "./components/NovoPMZCard";
+import { LivePreviewPanel } from "./components/LivePreviewPanel";
+import { MarketIntelPanel } from "./components/MarketIntelPanel";
 
 const OFFER_TYPES: { value: OfferType; label: string }[] = [
   { value: "simple_price", label: "Preço Simples" },
@@ -78,7 +77,7 @@ export function BuyerDeskPage() {
   const [seqError, setSeqError] = useState<string | null>(null);
   const [product, setProduct] = useState<ProductWithCommercial | null>(null);
   const [pmzResult, setPmzResult] = useState<PmzCalcResult | null>(null);
-  const [intelOpen, setIntelOpen] = useState(true);
+  
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -371,37 +370,7 @@ export function BuyerDeskPage() {
                 </div>
 
                 {/* PMZ Card */}
-                <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-canvas)] p-3">
-                  <div className="flex items-start justify-between">
-                    <div className="section-label">Novo PMZ</div>
-                    <RefreshCw size={13} strokeWidth={1.5} className="text-[var(--text-tertiary)]" />
-                  </div>
-                  <div
-                    className={cn(
-                      "mt-1 font-mono text-[22px] font-medium",
-                      pmzResult?.status === "ok" && "text-[var(--status-ok)]",
-                      pmzResult?.status === "warn" && "text-[var(--status-warn)]",
-                      pmzResult?.status === "critical" && "text-[var(--status-critical)]",
-                      !pmzResult && "text-[var(--text-tertiary)]",
-                    )}
-                  >
-                    {pmzResult ? formatBRL(pmzResult.novoPmz) : "—"}
-                  </div>
-                  <div className="mt-1 flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">Margem Oferta</span>
-                    <span
-                      className={cn(
-                        "font-mono text-[12px]",
-                        pmzResult?.status === "ok" && "text-[var(--status-ok)]",
-                        pmzResult?.status === "warn" && "text-[var(--status-warn)]",
-                        pmzResult?.status === "critical" && "text-[var(--status-critical)]",
-                        !pmzResult && "text-[var(--text-tertiary)]",
-                      )}
-                    >
-                      {pmzResult ? `${pmzResult.marginPercent.toFixed(1)}%` : "—"}
-                    </span>
-                  </div>
-                </div>
+                <NovoPMZCard result={pmzResult} />
               </div>
 
               {pmzResult?.status === "warn" && (
@@ -521,104 +490,14 @@ export function BuyerDeskPage() {
 
         {/* Right column */}
         <div className="space-y-6">
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
-            <div className="flex items-center justify-between">
-              <span className="section-label">Preview do Slot</span>
-              <RefreshCw size={13} strokeWidth={1.5} className="text-[var(--text-tertiary)]" />
-            </div>
-            <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-white p-6">
-              <div className="grid h-48 w-full place-items-center rounded border border-dashed border-neutral-300 text-neutral-400">
-                <div className="flex flex-col items-center gap-1">
-                  <ImagePlus size={28} strokeWidth={1.2} />
-                  <span className="text-[12px]">Sem imagem</span>
-                </div>
-              </div>
-              <div className="mt-4 text-[16px] text-neutral-900">
-                {description || product?.product.description || "Produto"}
-              </div>
-              <div className="mt-1 font-mono text-[28px] font-bold text-neutral-900">
-                {promotionalPrice ? formatBRL(promotionalPrice) : "R$ —"}
-              </div>
-              {offerType === "de_por" && product && (
-                <div className="font-mono text-[12px] text-neutral-500 line-through">
-                  De {formatBRL(product.commercial.salePrice)}
-                </div>
-              )}
-            </div>
-            {charError && (
-              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--status-critical-muted)] px-2 py-1 text-[11px] text-[var(--status-critical)]">
-                <AlertCircle size={12} /> Texto estourado
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)]">
-            <button
-              type="button"
-              onClick={() => setIntelOpen((v) => !v)}
-              className="flex w-full items-center justify-between p-4"
-            >
-              <span className="section-label">Inteligência de Mercado</span>
-              {intelOpen ? <ChevronUp size={14} className="text-[var(--text-tertiary)]" /> : <ChevronDown size={14} className="text-[var(--text-tertiary)]" />}
-            </button>
-            {intelOpen && product && (
-              <div className="space-y-4 px-4 pb-4">
-                <div>
-                  <div className="text-[11px] text-[var(--text-tertiary)] mb-1.5">Curva ABC</div>
-                  <div className="flex h-2 overflow-hidden rounded-full">
-                    <div className={cn("flex-1", product.commercial.abcCurve === "A" ? "bg-[var(--status-ok)]" : "bg-[var(--bg-overlay)]")} />
-                    <div className={cn("flex-1", product.commercial.abcCurve === "B" ? "bg-[var(--status-warn)]" : "bg-[var(--bg-overlay)]")} />
-                    <div className={cn("flex-1", product.commercial.abcCurve === "C" ? "bg-[var(--status-critical)]" : "bg-[var(--bg-overlay)]")} />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-[11px] text-[var(--text-tertiary)] mb-1.5">Estoque por loja</div>
-                  <div className="space-y-1.5">
-                    {["BH Centro", "Caeté", "Nazaré"].map((l, i) => (
-                      <div key={l} className="flex items-center gap-2 text-[11px]">
-                        <span className="w-20 text-[var(--text-secondary)]">{l}</span>
-                        <div className="flex-1">
-                          <ProgressBar value={[80, 50, 25][i]} max={100} tone={i === 2 ? "warn" : "accent"} />
-                        </div>
-                        <span className="font-mono text-[var(--text-primary)]">{[480, 320, 180][i]}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-[11px] text-[var(--text-tertiary)] mb-1.5">Histórico promocional</div>
-                  <div className="space-y-1.5">
-                    {["FQ-2024-25", "FQ-2024-22", "FQ-2024-18"].map((c, i) => (
-                      <div key={c} className="flex items-center justify-between text-[11px]">
-                        <span className="font-mono text-[var(--text-secondary)]">{c}</span>
-                        <span className={cn(
-                          "status-pill",
-                          i === 0 ? "text-[var(--status-ok)] bg-[var(--status-ok-muted)]"
-                          : i === 1 ? "text-[var(--status-warn)] bg-[var(--status-warn-muted)]"
-                          : "text-[var(--status-critical)] bg-[var(--status-critical-muted)]",
-                        )}>
-                          {["Bom", "Regular", "Baixo"][i]}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="status-pill text-[var(--status-warn)] bg-[var(--status-warn-muted)]">
-                    <AlertTriangle size={11} /> Risco de Ruptura · Médio
-                  </span>
-                  <span className="status-pill text-[var(--status-neutral)] bg-[#64748b22]">
-                    Baixa Expressividade · Baixo
-                  </span>
-                </div>
-              </div>
-            )}
-            {intelOpen && !product && (
-              <div className="px-4 pb-4 text-[12px] text-[var(--text-tertiary)]">
-                Busque um SEQPRODUTO para ver inteligência de mercado.
-              </div>
-            )}
-          </div>
+          <LivePreviewPanel
+            description={description}
+            promotionalPrice={promotionalPrice}
+            offerType={offerType}
+            product={product}
+            charError={charError}
+          />
+          <MarketIntelPanel product={product} />
         </div>
       </div>
     </div>

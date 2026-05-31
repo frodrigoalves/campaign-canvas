@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth-store";
+import { usePermission } from "@/hooks/usePermission";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "@tanstack/react-router";
@@ -34,31 +35,31 @@ const NAV: NavGroup[] = [
   {
     label: "Operacional",
     items: [
-      { label: "Campanhas", icon: LayoutGrid, to: "/campaigns" },
-      { label: "Compradores", icon: Users, comingSoon: true },
-      { label: "Estrutura Editorial", icon: Layers, comingSoon: true },
+      { label: "Campanhas", icon: LayoutGrid, to: "/campaigns", permission: "campaigns.view" },
+      { label: "Compradores", icon: Users, permission: "buyers.monitor", comingSoon: true },
+      { label: "Estrutura Editorial", icon: Layers, permission: "editorial.manage", comingSoon: true },
     ],
   },
   {
     label: "Conteúdo",
     items: [
-      { label: "Mesa do Comprador", icon: ShoppingBag, to: "/buyer-desk" },
-      { label: "Banco de Imagens", icon: ImageIcon, comingSoon: true },
-      { label: "Preview", icon: Eye, comingSoon: true },
+      { label: "Mesa do Comprador", icon: ShoppingBag, to: "/buyer-desk", permission: "buyer_desk.use" },
+      { label: "Banco de Imagens", icon: ImageIcon, permission: "images.manage", comingSoon: true },
+      { label: "Preview", icon: Eye, permission: "preview.view", comingSoon: true },
     ],
   },
   {
     label: "Aprovações",
     items: [
-      { label: "Aprovações", icon: CheckSquare, comingSoon: true },
-      { label: "Exportação", icon: Send, comingSoon: true },
+      { label: "Aprovações", icon: CheckSquare, permission: "campaigns.approve_final", comingSoon: true },
+      { label: "Exportação", icon: Send, permission: "campaigns.release", comingSoon: true },
     ],
   },
   {
     label: "Gestão",
     items: [
-      { label: "Dashboard", icon: BarChart2, comingSoon: true },
-      { label: "Administração", icon: Settings, comingSoon: true },
+      { label: "Dashboard", icon: BarChart2, permission: "dashboards.view", comingSoon: true },
+      { label: "Administração", icon: Settings, permission: "*", comingSoon: true },
     ],
   },
 ];
@@ -66,8 +67,14 @@ const NAV: NavGroup[] = [
 export function Sidebar() {
   const user = useAuthStore((s) => s.user);
   const clear = useAuthStore((s) => s.clear);
+  const { can } = usePermission();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const visibleNav = NAV.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => !item.permission || item.permission === "*" || can(item.permission)),
+  })).filter((group) => group.items.length > 0);
 
   const initials = (user?.name ?? "??")
     .split(" ")
@@ -93,7 +100,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-4">
-        {NAV.map((group) => (
+        {visibleNav.map((group) => (
           <div key={group.label} className="mt-6 first:mt-2">
             <div className="px-3 pb-2 text-[10px] uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-medium">
               {group.label}
