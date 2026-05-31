@@ -77,7 +77,7 @@ export function BuyerDeskPage() {
   const [seqError, setSeqError] = useState<string | null>(null);
   const [product, setProduct] = useState<ProductWithCommercial | null>(null);
   const [pmzResult, setPmzResult] = useState<PmzCalcResult | null>(null);
-  const [intelOpen, setIntelOpen] = useState(true);
+  
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
