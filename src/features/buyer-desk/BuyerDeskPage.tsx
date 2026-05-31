@@ -47,13 +47,21 @@ const EXPOSURE_TYPES = [
 
 const formSchema = z.object({
   descriptionNewspaper: z.string().min(1, "Obrigatório").max(80),
-  offerType: z.enum(["simple_price", "de_por", "take_x_pay_y", "app_price", "combo", "opportunity"]),
+  offerType: z.enum([
+    "simple_price",
+    "de_por",
+    "this_package",
+    "take_x_pay_y",
+    "app_price",
+    "combo",
+    "opportunity",
+  ]),
   exposureType: z.enum(["single", "box", "insert", "highlight"]),
   promotionalPrice: z.coerce.number().min(0.01, "Preço inválido"),
   sellOutOn: z.boolean(),
-  sellOutValue: z.coerce.number().min(0).default(0),
+  sellOutValue: z.coerce.number().min(0),
   sellOutAgreementNumber: z.string().optional(),
-  insertValue: z.coerce.number().min(0).default(0),
+  insertValue: z.coerce.number().min(0),
   insertBoxAgreementNumber: z.string().optional(),
 });
 
