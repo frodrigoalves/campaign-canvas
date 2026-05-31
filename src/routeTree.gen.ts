@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated.campaigns'
+import { Route as AuthenticatedBuyerDeskRouteImport } from './routes/_authenticated.buyer-desk'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -33,15 +34,22 @@ const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
   path: '/campaigns',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedBuyerDeskRoute = AuthenticatedBuyerDeskRouteImport.update({
+  id: '/buyer-desk',
+  path: '/buyer-desk',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/buyer-desk': typeof AuthenticatedBuyerDeskRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/buyer-desk': typeof AuthenticatedBuyerDeskRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
 }
 export interface FileRoutesById {
@@ -49,18 +57,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/buyer-desk': typeof AuthenticatedBuyerDeskRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/campaigns'
+  fullPaths: '/' | '/login' | '/buyer-desk' | '/campaigns'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/campaigns'
+  to: '/' | '/login' | '/buyer-desk' | '/campaigns'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/buyer-desk'
     | '/_authenticated/campaigns'
   fileRoutesById: FileRoutesById
 }
@@ -100,14 +110,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCampaignsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/buyer-desk': {
+      id: '/_authenticated/buyer-desk'
+      path: '/buyer-desk'
+      fullPath: '/buyer-desk'
+      preLoaderRoute: typeof AuthenticatedBuyerDeskRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedBuyerDeskRoute: typeof AuthenticatedBuyerDeskRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBuyerDeskRoute: AuthenticatedBuyerDeskRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
 }
 
