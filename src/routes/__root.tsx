@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Sistema Grupo Cevaroli" },
+      { name: "description", content: "Sistema Grupo Cevaroli" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Sistema Grupo Cevaroli" },
+      { property: "og:description", content: "Sistema Grupo Cevaroli" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Sistema Grupo Cevaroli" },
+      { name: "twitter:description", content: "Sistema Grupo Cevaroli" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/juxPcRc0bEOC2ItdM5YgQEjCCeH3/social-images/social-1780229975281-br-dd14e21915bbf7ab.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/juxPcRc0bEOC2ItdM5YgQEjCCeH3/social-images/social-1780229975281-br-dd14e21915bbf7ab.webp" },
     ],
     links: [
       {
