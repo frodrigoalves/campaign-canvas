@@ -370,37 +370,7 @@ export function BuyerDeskPage() {
                 </div>
 
                 {/* PMZ Card */}
-                <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-canvas)] p-3">
-                  <div className="flex items-start justify-between">
-                    <div className="section-label">Novo PMZ</div>
-                    <RefreshCw size={13} strokeWidth={1.5} className="text-[var(--text-tertiary)]" />
-                  </div>
-                  <div
-                    className={cn(
-                      "mt-1 font-mono text-[22px] font-medium",
-                      pmzResult?.status === "ok" && "text-[var(--status-ok)]",
-                      pmzResult?.status === "warn" && "text-[var(--status-warn)]",
-                      pmzResult?.status === "critical" && "text-[var(--status-critical)]",
-                      !pmzResult && "text-[var(--text-tertiary)]",
-                    )}
-                  >
-                    {pmzResult ? formatBRL(pmzResult.novoPmz) : "—"}
-                  </div>
-                  <div className="mt-1 flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">Margem Oferta</span>
-                    <span
-                      className={cn(
-                        "font-mono text-[12px]",
-                        pmzResult?.status === "ok" && "text-[var(--status-ok)]",
-                        pmzResult?.status === "warn" && "text-[var(--status-warn)]",
-                        pmzResult?.status === "critical" && "text-[var(--status-critical)]",
-                        !pmzResult && "text-[var(--text-tertiary)]",
-                      )}
-                    >
-                      {pmzResult ? `${pmzResult.marginPercent.toFixed(1)}%` : "—"}
-                    </span>
-                  </div>
-                </div>
+                <NovoPMZCard result={pmzResult} />
               </div>
 
               {pmzResult?.status === "warn" && (
