@@ -31,7 +31,6 @@ export const useAuthStore = create<AuthStore>()(
       storage: createJSONStorage(() =>
         typeof window !== "undefined" ? window.localStorage : (noopStorage as unknown as Storage),
       ),
-      skipHydration: true,
     },
   ),
 );
