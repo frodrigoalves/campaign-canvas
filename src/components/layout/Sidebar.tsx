@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth-store";
+import { usePermission } from "@/hooks/usePermission";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "@tanstack/react-router";
@@ -34,31 +35,31 @@ const NAV: NavGroup[] = [
   {
     label: "Operacional",
     items: [
-      { label: "Campanhas", icon: LayoutGrid, to: "/campaigns" },
-      { label: "Compradores", icon: Users, comingSoon: true },
-      { label: "Estrutura Editorial", icon: Layers, comingSoon: true },
+      { label: "Campanhas", icon: LayoutGrid, to: "/campaigns", permission: "campaigns.view" },
+      { label: "Compradores", icon: Users, permission: "buyers.monitor", comingSoon: true },
+      { label: "Estrutura Editorial", icon: Layers, permission: "editorial.manage", comingSoon: true },
     ],
   },
   {
     label: "Conteúdo",
     items: [
-      { label: "Mesa do Comprador", icon: ShoppingBag, to: "/buyer-desk" },
-      { label: "Banco de Imagens", icon: ImageIcon, comingSoon: true },
-      { label: "Preview", icon: Eye, comingSoon: true },
+      { label: "Mesa do Comprador", icon: ShoppingBag, to: "/buyer-desk", permission: "buyer_desk.use" },
+      { label: "Banco de Imagens", icon: ImageIcon, permission: "images.manage", comingSoon: true },
+      { label: "Preview", icon: Eye, permission: "preview.view", comingSoon: true },
     ],
   },
   {
     label: "Aprovações",
     items: [
-      { label: "Aprovações", icon: CheckSquare, comingSoon: true },
-      { label: "Exportação", icon: Send, comingSoon: true },
+      { label: "Aprovações", icon: CheckSquare, permission: "campaigns.approve_final", comingSoon: true },
+      { label: "Exportação", icon: Send, permission: "campaigns.release", comingSoon: true },
     ],
   },
   {
     label: "Gestão",
     items: [
-      { label: "Dashboard", icon: BarChart2, comingSoon: true },
-      { label: "Administração", icon: Settings, comingSoon: true },
+      { label: "Dashboard", icon: BarChart2, permission: "dashboards.view", comingSoon: true },
+      { label: "Administração", icon: Settings, permission: "*", comingSoon: true },
     ],
   },
 ];
