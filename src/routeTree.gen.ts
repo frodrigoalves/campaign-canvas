@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated.campaigns'
 import { Route as AuthenticatedBuyerDeskRouteImport } from './routes/_authenticated.buyer-desk'
 
@@ -24,10 +24,10 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
   id: '/campaigns',
@@ -41,41 +41,40 @@ const AuthenticatedBuyerDeskRoute = AuthenticatedBuyerDeskRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/buyer-desk': typeof AuthenticatedBuyerDeskRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/buyer-desk': typeof AuthenticatedBuyerDeskRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/buyer-desk': typeof AuthenticatedBuyerDeskRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/login' | '/buyer-desk' | '/campaigns'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/buyer-desk' | '/campaigns'
+  to: '/login' | '/buyer-desk' | '/campaigns' | '/'
   id:
     | '__root__'
-    | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/buyer-desk'
     | '/_authenticated/campaigns'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
@@ -96,12 +95,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/campaigns': {
       id: '/_authenticated/campaigns'
@@ -123,11 +122,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedBuyerDeskRoute: typeof AuthenticatedBuyerDeskRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBuyerDeskRoute: AuthenticatedBuyerDeskRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -135,10 +136,19 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

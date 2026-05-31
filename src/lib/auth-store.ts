@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { User } from "@/types/user.types";
 
 interface AuthStore {
@@ -9,6 +9,12 @@ interface AuthStore {
   setSession: (user: User, token: string) => void;
   clear: () => void;
 }
+
+const noopStorage = {
+  getItem: () => null,
+  setItem: () => {},
+  removeItem: () => {},
+};
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -20,6 +26,12 @@ export const useAuthStore = create<AuthStore>()(
         set({ user, token, isAuthenticated: true }),
       clear: () => set({ user: null, token: null, isAuthenticated: false }),
     }),
-    { name: "cevaroli.auth" },
+    {
+      name: "cevaroli.auth",
+      storage: createJSONStorage(() =>
+        typeof window !== "undefined" ? window.localStorage : (noopStorage as unknown as Storage),
+      ),
+    },
   ),
 );
+
