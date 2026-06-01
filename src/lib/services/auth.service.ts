@@ -19,18 +19,28 @@ const PASSWORD_ROLE_MAP: Record<string, User["role"]> = {
   designer: "designer",
 };
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3333";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function createToken(user: User) {
   return btoa(`${user.id}:${user.email}:${Date.now()}`);
 }
 
 async function fetchJson<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, init);
+  let response: Response;
+
+  try {
+    response = await fetch(input, init);
+  } catch (error) {
+    throw new Error("Não foi possível conectar ao servidor de autenticação.");
+  }
+
   const body = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const errorMessage = (body as any)?.error || response.statusText || "Erro ao processar a requisição.";
+    const errorMessage =
+      (body as Record<string, unknown>)?.error ||
+      response.statusText ||
+      "Erro ao processar a requisição.";
     throw new Error(errorMessage);
   }
 
@@ -61,7 +71,9 @@ export const authService = {
       });
     }
 
-    throw new Error("Senha inválida. Use cevaroli, comprador, marketing ou designer.");
+    throw new Error(
+      "Senha inválida. Use cevaroli, comprador, marketing ou designer, ou configure VITE_API_URL para um backend válido.",
+    );
   },
 
   async logout(): Promise<void> {

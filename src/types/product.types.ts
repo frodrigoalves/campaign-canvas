@@ -25,6 +25,9 @@ export interface ProductCommercialData {
   lowestCompetitorPrice90d: number;
   competitorResearchDate: string;
   competitorName: string;
+  days_to_rupture: number;
+  order_status: string;
+  stock_excess_value: number;
 }
 
 export interface ProductWithCommercial {

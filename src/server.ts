@@ -42,22 +42,32 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-        const normalized = await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
 
-        // Ensure HTML responses include a DOCTYPE to avoid Quirks Mode in some browsers
-        const contentType = normalized.headers.get("content-type") ?? "";
-        if (contentType.includes("text/html")) {
-          const bodyText = await normalized.clone().text();
-          if (!/^\s*<!doctype html>/i.test(bodyText)) {
-            const headers = new Headers(normalized.headers);
-            return new Response("<!DOCTYPE html>\n" + bodyText, {
-              status: normalized.status,
-              headers,
-            });
-          }
+      // Ensure HTML responses include a DOCTYPE to avoid Quirks Mode in some browsers
+      const contentType = normalized.headers.get("content-type") ?? "";
+      if (contentType.includes("text/html")) {
+        let bodyText = await normalized.clone().text();
+        const hasDoctype = /^\s*<!doctype html>/i.test(bodyText);
+        const hasHtmlTag = /<html[\s>]/i.test(bodyText);
+
+        if (!hasHtmlTag && bodyText.includes("<!--$-->")) {
+          const [head, body] = bodyText.split("<!--$-->");
+          bodyText = `<!DOCTYPE html><html lang="en"><head>${head}</head><body>${body}</body></html>`;
+        } else if (!hasDoctype) {
+          bodyText = "<!DOCTYPE html>\n" + bodyText;
         }
 
-        return normalized;
+        if (bodyText !== (await normalized.clone().text())) {
+          const headers = new Headers(normalized.headers);
+          return new Response(bodyText, {
+            status: normalized.status,
+            headers,
+          });
+        }
+      }
+
+      return normalized;
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

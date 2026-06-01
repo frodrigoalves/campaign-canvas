@@ -69,9 +69,7 @@ export function MarketIntelPanel({ product }: MarketIntelPanelProps) {
                       tone={i === 2 ? "warn" : "accent"}
                     />
                   </div>
-                  <span className="font-mono text-[var(--text-primary)]">
-                    {[480, 320, 180][i]}
-                  </span>
+                  <span className="font-mono text-[var(--text-primary)]">{[480, 320, 180][i]}</span>
                 </div>
               ))}
             </div>
@@ -90,8 +88,8 @@ export function MarketIntelPanel({ product }: MarketIntelPanelProps) {
                       i === 0
                         ? "text-[var(--status-ok)] bg-[var(--status-ok-muted)]"
                         : i === 1
-                        ? "text-[var(--status-warn)] bg-[var(--status-warn-muted)]"
-                        : "text-[var(--status-critical)] bg-[var(--status-critical-muted)]",
+                          ? "text-[var(--status-warn)] bg-[var(--status-warn-muted)]"
+                          : "text-[var(--status-critical)] bg-[var(--status-critical-muted)]",
                     )}
                   >
                     {["Bom", "Regular", "Baixo"][i]}

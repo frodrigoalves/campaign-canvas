@@ -4,27 +4,22 @@ import { CampaignsListPage, campaignsQueryOptions } from "@/features/campaigns/C
 
 const searchSchema = z.object({
   search: z.string().optional(),
-  type: z.enum([
-    "all",
-    "promotional_print",
-    "commercial",
-    "seasonal",
-    "opportunity",
-    "stock",
-    "regional",
-    "digital",
-    "only_app",
-  ]).optional(),
-  status: z.enum([
-    "all",
-    "draft",
-    "configured",
-    "open",
-    "filling",
-    "review",
-    "approved",
-    "exported",
-  ]).optional(),
+  type: z
+    .enum([
+      "all",
+      "promotional_print",
+      "commercial",
+      "seasonal",
+      "opportunity",
+      "stock",
+      "regional",
+      "digital",
+      "only_app",
+    ])
+    .optional(),
+  status: z
+    .enum(["all", "draft", "configured", "open", "filling", "review", "approved", "exported"])
+    .optional(),
   page: z.coerce.number().min(1).default(1).optional(),
 });
 

@@ -1,7 +1,16 @@
 import type { Product, ProductCommercialData, ProductWithCommercial } from "@/types/product.types";
 
 const DEPARTMENTS = ["Bazar", "Mercearia", "FLV", "Higiene", "Bebidas"];
-const SUPPLIERS = ["Unilever", "Nestlé", "Ambev", "P&G", "JBS", "BRF", "Coca-Cola FEMSA", "Pepsico"];
+const SUPPLIERS = [
+  "Unilever",
+  "Nestlé",
+  "Ambev",
+  "P&G",
+  "JBS",
+  "BRF",
+  "Coca-Cola FEMSA",
+  "Pepsico",
+];
 const FAMILIES: Record<string, string[]> = {
   Bazar: ["Limpeza Lar", "Utilidades", "Pet"],
   Mercearia: ["Massas", "Conservas", "Café"],
@@ -10,11 +19,41 @@ const FAMILIES: Record<string, string[]> = {
   Bebidas: ["Cervejas", "Refrigerantes", "Sucos"],
 };
 const PRODUCT_NAMES: Record<string, string[]> = {
-  Bazar: ["Detergente Líquido 500ml", "Esponja Multiuso", "Vassoura Cerdas Duras", "Ração Premium 15kg", "Sacola Reutilizável"],
-  Mercearia: ["Macarrão Espaguete 500g", "Molho de Tomate 340g", "Café Torrado 500g", "Arroz Tipo 1 5kg", "Feijão Carioca 1kg"],
-  FLV: ["Banana Prata kg", "Tomate Italiano kg", "Alface Crespa un", "Cenoura kg", "Batata Inglesa kg"],
-  Higiene: ["Shampoo Anticaspa 400ml", "Creme Dental 90g", "Sabonete Líquido 250ml", "Desodorante Aerosol 150ml", "Condicionador 400ml"],
-  Bebidas: ["Cerveja Pilsen Lata 350ml", "Refrigerante Cola 2L", "Suco Néctar Uva 1L", "Água Mineral 500ml", "Energético Lata 269ml"],
+  Bazar: [
+    "Detergente Líquido 500ml",
+    "Esponja Multiuso",
+    "Vassoura Cerdas Duras",
+    "Ração Premium 15kg",
+    "Sacola Reutilizável",
+  ],
+  Mercearia: [
+    "Macarrão Espaguete 500g",
+    "Molho de Tomate 340g",
+    "Café Torrado 500g",
+    "Arroz Tipo 1 5kg",
+    "Feijão Carioca 1kg",
+  ],
+  FLV: [
+    "Banana Prata kg",
+    "Tomate Italiano kg",
+    "Alface Crespa un",
+    "Cenoura kg",
+    "Batata Inglesa kg",
+  ],
+  Higiene: [
+    "Shampoo Anticaspa 400ml",
+    "Creme Dental 90g",
+    "Sabonete Líquido 250ml",
+    "Desodorante Aerosol 150ml",
+    "Condicionador 400ml",
+  ],
+  Bebidas: [
+    "Cerveja Pilsen Lata 350ml",
+    "Refrigerante Cola 2L",
+    "Suco Néctar Uva 1L",
+    "Água Mineral 500ml",
+    "Energético Lata 269ml",
+  ],
 };
 
 function pseudoRandom(seed: number) {
@@ -50,6 +89,7 @@ export const mockProducts: ProductWithCommercial[] = (() => {
       const pmz = +(2 + rand() * 18).toFixed(2);
       const salePrice = +(pmz * (1.2 + rand() * 0.4)).toFixed(2);
       const competitor = +(salePrice * (0.85 + rand() * 0.25)).toFixed(2);
+      const daysToRupture = Math.floor(rand() * 30);
       const commercial: ProductCommercialData = {
         productId: product.id,
         filial: "01 - Matriz BH",
@@ -64,7 +104,12 @@ export const mockProducts: ProductWithCommercial[] = (() => {
         avgSales30d: Math.floor(20 + rand() * 400),
         lowestCompetitorPrice90d: competitor,
         competitorResearchDate: "2025-01-12",
-        competitorName: ["Supermercado Verde", "Atacadão Norte", "Hiper Plus"][Math.floor(rand() * 3)],
+        competitorName: ["Supermercado Verde", "Atacadão Norte", "Hiper Plus"][
+          Math.floor(rand() * 3)
+        ],
+        days_to_rupture: daysToRupture,
+        order_status: daysToRupture < 8 ? "ATRASADO" : "NORMAL",
+        stock_excess_value: Math.max(0, Math.floor((rand() * 2 - 0.6) * 100)),
       };
       items.push({ product, commercial });
     }

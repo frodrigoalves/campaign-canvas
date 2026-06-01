@@ -1,4 +1,3 @@
-
 # Cevaroli — Plataforma de Gestão de Ofertas (Prompt 1)
 
 Entrega da base do app + 3 telas em alta fidelidade, adaptado ao stack real do template (TanStack Start + TanStack Router + TanStack Query). Sem backend real: dados via mocks tipados em memória, com delay artificial. Sem MSW e sem axios — chamadas isoladas em uma camada de "services" com a mesma interface dos endpoints definidos, pronta para troca por HTTP real depois.
@@ -6,6 +5,7 @@ Entrega da base do app + 3 telas em alta fidelidade, adaptado ao stack real do t
 ## 1. Design system global
 
 `src/styles.css` reescrito:
+
 - Importa Google Fonts: DM Serif Display, Geist, JetBrains Mono.
 - Define todos os tokens do spec (`--bg-canvas`, `--bg-surface`, `--bg-raised`, `--bg-overlay`, borders, texts, accents, status, gradients, radii, shadows, fontes, escala tipográfica, espaçamentos).
 - Mapeia os tokens dentro de `@theme inline` para gerar utilitários Tailwind v4 (`bg-canvas`, `bg-surface`, `text-primary`, `border-default`, `text-status-ok`, `font-display`, `font-mono`, `font-body`, etc.).
@@ -54,6 +54,7 @@ src/
 ```
 
 Notas:
+
 - Sem `react-router-dom`, sem `src/app/router.tsx`. Rotas seguem convenção do template em `src/routes/`.
 - `tanstack-router-plugin` regenera `routeTree.gen.ts` automaticamente.
 
@@ -72,12 +73,14 @@ Permissões: `ROLE_PERMISSIONS` conforme spec + `usePermission()` retornando `{ 
 ## 4. Shell, providers e proteção
 
 `__root.tsx`:
+
 - Mantém estrutura SSR (HeadContent/Scripts).
 - Envolve `<Outlet/>` em `QueryClientProvider` (já existe) + injeta `<Toaster/>` (sonner).
 - Atualiza meta tags para "Cevaroli — Gestão de Ofertas".
 - Cole link de fontes (preconnect Google Fonts) e favicon.
 
 `_authenticated.tsx`:
+
 - `beforeLoad` consulta `useAuthStore.getState()`; se não autenticado, `throw redirect({ to: "/login", search: { redirect: location.href } })`.
 - Componente renderiza `<AppShell><Outlet/></AppShell>`.
 
@@ -90,9 +93,11 @@ Permissões: `ROLE_PERMISSIONS` conforme spec + `usePermission()` retornando `{ 
 ## 5. Telas
 
 ### 5.1 Login (`/login`)
+
 Split 55/45, painel esquerdo decorativo com grid CSS sutil, logo Cevaroli (arquivo `unnamed.jpg` copiado para `src/assets/cevaroli-logo.jpg`) acima do título "Gestão de Ofertas" (DM Serif 52px), kicker "GRUPO CEVAROLI", versão `v1.0` no canto. Painel direito: formulário RHF+Zod (email/senha + show/hide), botão "Entrar" full width, alerta de erro inline, link "Esqueci minha senha". Submit chama `authService.login` (mock aceita qualquer email; senha `cevaroli` retorna admin, `comprador` retorna buyer, etc. — útil para testar RBAC). Após sucesso, `navigate({ to: search.redirect ?? "/campaigns" })`.
 
 ### 5.2 Lista de Campanhas (`/_authenticated/campaigns/`)
+
 - Loader: `context.queryClient.ensureQueryData(campaignsQueryOptions(searchFilters))`. Componente lê com `useSuspenseQuery`.
 - Filtros (`search`, `type`, `status`, `dateRange`) sincronizados na URL via `validateSearch` (zod) + `useNavigate`.
 - PageHeader com título DM Serif "Campanhas", subtítulo, botão `+ Nova Campanha` (desabilitado nesta fase, tooltip "Disponível no próximo passo").
@@ -103,7 +108,9 @@ Split 55/45, painel esquerdo decorativo com grid CSS sutil, logo Cevaroli (arqui
 - Paginação inferior baseada em meta do mock.
 
 ### 5.3 Mesa do Comprador (`/_authenticated/buyer-desk`)
+
 Layout grid 58/42 ≥1280px, empilha abaixo.
+
 - **Context bar** topo: nome da campanha mock atual + slot + progresso + deadline.
 - **SEQPRODUTO search**: input grande, JetBrains Mono 18px, on Enter chama `productService.searchBySeq`. Estados loading/erro inline.
 - **ProductDataPanel**: aparece com animação `fade-slide-in`. Duas linhas de chips (Departamento, Família, Fornecedor, Filial / PMZ, Preço Venda, Estoque, Média 30d, Curva ABC). Cartão de competitividade com preço, data, badge colorido e ícone TrendingDown/Up/Minus.
@@ -124,6 +131,7 @@ Layout grid 58/42 ≥1280px, empilha abaixo.
 ## 7. Dados mock
 
 `src/lib/mocks/`:
+
 - 3 lojas (BH, Caeté, Nazaré) em 2 clusters.
 - 5 buyers (Bazar, Mercearia, FLV, Higiene, Bebidas) com role `buyer` + 1 admin + 1 marketing + 1 commercial.
 - 8 campanhas cobrindo todos os status.
@@ -133,12 +141,14 @@ Layout grid 58/42 ≥1280px, empilha abaixo.
 ## 8. Variáveis de ambiente
 
 `.env.example`:
+
 ```
 VITE_API_URL=http://localhost:3333
 VITE_WS_URL=ws://localhost:3333
 VITE_APP_VERSION=1.0.0
 VITE_APP_ENV=development
 ```
+
 Cliente HTTP lê `VITE_API_URL`, mas nesta fase ignora (usa mocks).
 
 ## 9. Fora de escopo nesta iteração
@@ -151,4 +161,3 @@ Wizard de campanha, Estrutura Editorial, Aprovações, Dashboard Operacional, ba
 - **React Router v6 descartado** — TanStack Router é a convenção do template. RBAC e proteção feitas via `_authenticated` + `beforeLoad`, hook `usePermission` para granularidade.
 - **shadcn-ui** já presente; usaremos `Input`, `Button`, `Select`, `Switch`, `Toaster`, etc., com classes customizadas para alinhar ao tema dark editorial.
 - Sem testes automatizados nesta entrega.
-

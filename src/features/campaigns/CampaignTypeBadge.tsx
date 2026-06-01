@@ -47,7 +47,9 @@ export function CampaignTypeBadge({ type }: { type: CampaignType }) {
   const meta = TYPE_META[type];
 
   return (
-    <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.12em] ${meta.tone}`}>
+    <span
+      className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.12em] ${meta.tone}`}
+    >
       <span className={`h-2.5 w-2.5 rounded-full ${meta.dot}`} />
       {meta.label}
     </span>

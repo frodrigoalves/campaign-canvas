@@ -9,7 +9,8 @@ export const mockImportedCommercials: ProductCommercialData[] = [];
 export async function processCsvStream(stream: NodeJS.ReadableStream) {
   return new Promise<{ processed: number }>((resolve, reject) => {
     // use csv-parse in streaming mode at runtime
-    // @ts-ignore
+    // @ts-expect-error csv-parse has inconsistent module exports
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const parse = require("csv-parse");
     const parser = parse({ columns: true, delimiter: ";", relax_column_count: true });
 
@@ -25,8 +26,8 @@ export async function processCsvStream(stream: NodeJS.ReadableStream) {
     }
 
     parser.on("readable", () => {
-      let record: any;
-      // eslint-disable-next-line no-cond-assign
+      let record: Record<string, unknown>;
+
       while ((record = parser.read())) {
         // Map CSV columns to ProductCommercialData
         const mapped: ProductCommercialData = {
@@ -34,10 +35,10 @@ export async function processCsvStream(stream: NodeJS.ReadableStream) {
           filial: record.NROEMPRESA ? `Filial ${record.NROEMPRESA}` : "01 - Matriz",
           pmz: parseFloat(record.PMZSEGMENTOPRINC ?? record.PMZ ?? "0") || 0,
           salePrice: parseFloat(record.MAXPRECOVDAEMPRESA ?? record.VALOR ?? "0") || 0,
-          abcCurve: (record.ABC_FAMILIA_GERAL ?? "") as any,
+          abcCurve: (record.ABC_FAMILIA_GERAL ?? "") as "A" | "B" | "C",
           storeRole: record.PAPEL_NA_LOJA ?? "",
           salesTrend: record.TENDENCIA_VENDA ?? "",
-          priceSensitivity: (record.SENSIBILIDADE_PRECO ?? "") as any,
+          priceSensitivity: (record.SENSIBILIDADE_PRECO ?? "") as "high" | "medium" | "low",
           lifecycle: record.CICLO_DE_VIDA ?? "",
           stockQty: parseInt(record.ESTOQUE_ATUAL ?? "0", 10) || 0,
           avgSales30d: parseInt(record.QTD_VENDIDA_MES_VIGENTE ?? "0", 10) || 0,

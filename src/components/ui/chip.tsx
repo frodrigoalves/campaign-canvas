@@ -9,14 +9,22 @@ interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_STYLES: Record<ChipVariant, string> = {
-  default: "bg-[var(--bg-overlay)] text-[var(--text-secondary)] border border-[var(--border-default)]",
+  default:
+    "bg-[var(--bg-overlay)] text-[var(--text-secondary)] border border-[var(--border-default)]",
   active: "bg-[var(--accent-primary)] text-white border border-transparent",
   warn: "bg-[var(--status-warn-muted)] text-[var(--status-warn)] border border-[var(--status-warn)]",
-  critical: "bg-[var(--status-critical-muted)] text-[var(--status-critical)] border border-[var(--status-critical)]",
+  critical:
+    "bg-[var(--status-critical-muted)] text-[var(--status-critical)] border border-[var(--status-critical)]",
   ok: "bg-[var(--status-ok-muted)] text-[var(--status-ok)] border border-[var(--status-ok)]",
 };
 
-export function Chip({ variant = "default", className, children, type = "button", ...props }: ChipProps) {
+export function Chip({
+  variant = "default",
+  className,
+  children,
+  type = "button",
+  ...props
+}: ChipProps) {
   return (
     <button
       type={type}

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { EmptyState } from "./empty-state";
 import { cn } from "@/lib/utils";
@@ -42,7 +43,61 @@ export function DataTable<T extends object>({
   onRowClick,
   className,
 }: DataTableProps<T>) {
+  const [visibleCells, setVisibleCells] = useState<Record<string, boolean>>({});
   const hasData = data.length > 0;
+
+  const maskEmail = (value: string) => {
+    const [local, domain] = value.split("@");
+    if (!domain) return value;
+    return `${local.slice(0, 3)}***@${domain}`;
+  };
+
+  const maskPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    return digits.length > 2 ? `${digits.slice(0, 2)}******` : value;
+  };
+
+  const renderDefaultCell = (row: T, accessor: keyof T, rowIndex: number) => {
+    const rawValue = row[accessor];
+    if (typeof rawValue !== "string") return rawValue as ReactNode;
+
+    const isEmail = accessor === "email";
+    const isPhone = accessor === "phone";
+    const cellKey = `${rowIndex}-${String(accessor)}`;
+    const visible = visibleCells[cellKey];
+
+    if (isEmail) {
+      return (
+        <div className="flex items-center gap-2">
+          <span>{visible ? rawValue : maskEmail(rawValue)}</span>
+          <button
+            type="button"
+            onClick={() => setVisibleCells((prev) => ({ ...prev, [cellKey]: !prev[cellKey] }))}
+            className="text-[11px] text-[var(--accent-primary)] hover:underline"
+          >
+            {visible ? "Ocultar" : "Mostrar"}
+          </button>
+        </div>
+      );
+    }
+
+    if (isPhone) {
+      return (
+        <div className="flex items-center gap-2">
+          <span>{visible ? rawValue : maskPhone(rawValue)}</span>
+          <button
+            type="button"
+            onClick={() => setVisibleCells((prev) => ({ ...prev, [cellKey]: !prev[cellKey] }))}
+            className="text-[11px] text-[var(--accent-primary)] hover:underline"
+          >
+            {visible ? "Ocultar" : "Mostrar"}
+          </button>
+        </div>
+      );
+    }
+
+    return rawValue as ReactNode;
+  };
 
   return (
     <div
@@ -92,7 +147,7 @@ export function DataTable<T extends object>({
                       {column.cell
                         ? column.cell(row)
                         : column.accessor
-                          ? (row[column.accessor] as ReactNode)
+                          ? renderDefaultCell(row, column.accessor, rowIndex)
                           : null}
                     </td>
                   ))}

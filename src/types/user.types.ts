@@ -12,14 +12,14 @@ export type UserStatus = "active" | "inactive" | "pending" | "blocked";
 export interface User {
   id: string;
   name: string;
-  email: string;
-  phone: string;
+  email: string; // sensitive
+  phone: string; // sensitive
   role: UserRole;
   status: UserStatus;
   storeId: string | null;
-  allowedStores: string[];
+  allowedStores: string[]; // sensitive
   allowedClusters: string[];
-  allowedCategories: string[];
+  allowedCategories: string[]; // sensitive
   lastAccess: string | null;
   createdAt: string;
 }

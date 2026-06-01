@@ -80,13 +80,14 @@ const slots: EditorialSlot[] = modules.flatMap((module, index) => [
     id: `slot-${index * 2 + 2}`,
     moduleId: module.id,
     name: "Posição Inferior",
-    assignedBuyerId: index % 3 === 0 ? mockUsers.find((u) => u.role === "buyer")?.id ?? null : null,
+    assignedBuyerId:
+      index % 3 === 0 ? (mockUsers.find((u) => u.role === "buyer")?.id ?? null) : null,
     createdAt: module.createdAt,
   },
 ]);
 
 function getBuyer(id: string | null): User | null {
-  return id ? mockUsers.find((user) => user.id === id) ?? null : null;
+  return id ? (mockUsers.find((user) => user.id === id) ?? null) : null;
 }
 
 export const editorialService = {

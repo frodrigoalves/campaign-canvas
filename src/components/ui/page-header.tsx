@@ -15,9 +15,7 @@ export function PageHeader({ title, subtitle, actions, className }: PageHeaderPr
         <h1 className="font-display text-[32px] leading-[1.1] text-[var(--text-primary)]">
           {title}
         </h1>
-        {subtitle && (
-          <p className="text-sm text-[var(--text-secondary)] max-w-2xl">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-sm text-[var(--text-secondary)] max-w-2xl">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </header>

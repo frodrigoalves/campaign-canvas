@@ -25,10 +25,12 @@ Data: 31 de maio de 2026
 ## Status de Testes Locais
 
 ### Frontend
+
 - Comando: `npm run build`
 - Resultado: build concluída com sucesso.
 
 ### Backend
+
 - Comando: `cd backend && npm run dev -- --inspect=false`
 - Resultado: servidor iniciado com sucesso em `http://localhost:3333`.
 

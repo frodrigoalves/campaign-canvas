@@ -17,7 +17,9 @@ const TONE: Record<NonNullable<ProgressBarProps["tone"]>, string> = {
 export function ProgressBar({ value, max = 100, tone = "accent", className }: ProgressBarProps) {
   const pct = Math.min(100, Math.max(0, (value / Math.max(1, max)) * 100));
   return (
-    <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-canvas)]", className)}>
+    <div
+      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-canvas)]", className)}
+    >
       <div
         className={cn("h-full rounded-full transition-[width]", TONE[tone])}
         style={{ width: `${pct}%` }}

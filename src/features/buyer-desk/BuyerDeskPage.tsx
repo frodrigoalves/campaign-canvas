@@ -8,9 +8,13 @@ import {
   AlertTriangle,
   ArrowRight,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Clock,
+  ImagePlus,
   Loader2,
   Minus,
+  RefreshCw,
   Search,
   TrendingDown,
   TrendingUp,
@@ -19,6 +23,7 @@ import {
 import { toast } from "sonner";
 import { productService } from "@/lib/services/product.service";
 import { promotionalItemsService } from "@/lib/services/promotional-items.service";
+import { useAuthStore } from "@/lib/auth-store";
 import { mockCampaigns } from "@/lib/mocks/campaigns";
 import type { ProductWithCommercial, OfferType, PmzCalcResult } from "@/types/product.types";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -77,6 +82,7 @@ export function BuyerDeskPage() {
   const [seqError, setSeqError] = useState<string | null>(null);
   const [product, setProduct] = useState<ProductWithCommercial | null>(null);
   const [pmzResult, setPmzResult] = useState<PmzCalcResult | null>(null);
+  const currentUser = useAuthStore((s) => s.user);
 
   const {
     register,
@@ -134,18 +140,13 @@ export function BuyerDeskPage() {
 
   const calcPmz = async (price: number) => {
     if (!product || price <= 0) return;
-    setCalcLoading(true);
-    try {
-      const result = await promotionalItemsService.calculatePmz({
-        pmz: product.commercial.pmz,
-        promotionalPrice: price,
-        sellOutValue: sellOutOn ? sellOutValue : 0,
-        insertValue,
-      });
-      setPmzResult(result);
-    } finally {
-      setCalcLoading(false);
-    }
+    const result = await promotionalItemsService.calculatePmz({
+      pmz: product.commercial.pmz,
+      promotionalPrice: price,
+      sellOutValue: sellOutOn ? sellOutValue : 0,
+      insertValue,
+    });
+    setPmzResult(result);
   };
 
   useEffect(() => {
@@ -154,8 +155,25 @@ export function BuyerDeskPage() {
     }
   }, [product, promotionalPrice]);
 
-  const onSubmit = async (_values: FormValues) => {
-    await new Promise((r) => setTimeout(r, 400));
+  const onSubmit = async (values: FormValues) => {
+    const payload = {
+      id: `item-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      campaignId: campaign.id,
+      slotId: "slot-1",
+      product: product!,
+      descriptionNewspaper: values.descriptionNewspaper,
+      offerType: values.offerType,
+      exposureType: values.exposureType,
+      sellOutValue: values.sellOutOn ? values.sellOutValue : 0,
+      sellOutAgreementNumber: values.sellOutAgreementNumber ?? "",
+      insertValue: values.insertValue,
+      insertBoxAgreementNumber: values.insertBoxAgreementNumber ?? "",
+      promotionalPrice: values.promotionalPrice,
+      pmzNew: pmzResult?.novoPmz ?? product!.commercial.pmz,
+      offerMarginPercent: pmzResult?.marginPercent ?? 0,
+    };
+
+    await promotionalItemsService.saveItem(payload, currentUser?.id ?? "system");
     toast.success("Item salvo com sucesso.");
   };
 
@@ -166,6 +184,13 @@ export function BuyerDeskPage() {
     setPmzResult(null);
     reset();
   };
+
+  const hasRuptureRisk = Boolean(
+    product &&
+    (product.commercial.days_to_rupture < 15 || product.commercial.order_status === "ATRASADO"),
+  );
+
+  const hasStockExcessOpportunity = Boolean(product && product.commercial.stock_excess_value > 0);
 
   const competitive: "ok" | "warn" | "critical" | null = product
     ? promotionalPrice && product.commercial.lowestCompetitorPrice90d
@@ -305,28 +330,36 @@ export function BuyerDeskPage() {
                 <div className="font-mono text-[24px] text-[var(--text-primary)]">
                   {formatBRL(product.commercial.lowestCompetitorPrice90d)}
                 </div>
-                <div
-                  className={cn(
-                    "status-pill",
-                    competitive === "ok" && "text-[var(--status-ok)] bg-[var(--status-ok-muted)]",
-                    competitive === "warn" &&
-                      "text-[var(--status-warn)] bg-[var(--status-warn-muted)]",
-                    competitive === "critical" &&
-                      "text-[var(--status-critical)] bg-[var(--status-critical-muted)]",
+                <div className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      "status-pill",
+                      competitive === "ok" && "text-[var(--status-ok)] bg-[var(--status-ok-muted)]",
+                      competitive === "warn" &&
+                        "text-[var(--status-warn)] bg-[var(--status-warn-muted)]",
+                      competitive === "critical" &&
+                        "text-[var(--status-critical)] bg-[var(--status-critical-muted)]",
+                    )}
+                  >
+                    {competitive === "ok" ? (
+                      <TrendingDown size={12} />
+                    ) : competitive === "warn" ? (
+                      <Minus size={12} />
+                    ) : (
+                      <TrendingUp size={12} />
+                    )}
+                    {competitive === "ok"
+                      ? "Competitivo"
+                      : competitive === "warn"
+                        ? "Atenção"
+                        : "Não competitivo"}
+                  </div>
+                  {hasStockExcessOpportunity && (
+                    <div className="inline-flex items-center gap-1 rounded-full bg-[var(--status-ok-muted)] px-3 py-1 text-[12px] text-[var(--status-ok)]">
+                      <TrendingDown size={12} />
+                      Excesso de estoque — candidato a oferta agressiva
+                    </div>
                   )}
-                >
-                  {competitive === "ok" ? (
-                    <TrendingDown size={12} />
-                  ) : competitive === "warn" ? (
-                    <Minus size={12} />
-                  ) : (
-                    <TrendingUp size={12} />
-                  )}
-                  {competitive === "ok"
-                    ? "Competitivo"
-                    : competitive === "warn"
-                      ? "Atenção"
-                      : "Não competitivo"}
                 </div>
               </div>
             </div>
@@ -335,6 +368,15 @@ export function BuyerDeskPage() {
           {/* Buyer fill form */}
           {product && (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 animate-fade-slide-in">
+              {hasRuptureRisk && (
+                <div className="flex items-start gap-2 rounded-md border-l-2 border-[var(--status-warn)] bg-[var(--status-warn-muted)] px-3 py-3 text-[13px] text-[var(--status-warn)]">
+                  <AlertTriangle size={18} strokeWidth={1.5} />
+                  <div>
+                    <div className="font-medium">Atenção</div>
+                    <div>Este produto tem risco de ruptura durante a vigência do jornal.</div>
+                  </div>
+                </div>
+              )}
               <div className="section-label">Dados do Item</div>
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

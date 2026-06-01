@@ -12,7 +12,7 @@ function buildBuyers(count: number, totalSlots: number, filledSlots: number) {
     name: b.name,
     department: b.allowedCategories[0] ?? "Geral",
     slotsAssigned: perBuyer,
-    slotsFilled: Math.min(perBuyer, Math.floor((filledSlots / selected.length) + (i % 2))),
+    slotsFilled: Math.min(perBuyer, Math.floor(filledSlots / selected.length + (i % 2))),
   }));
 }
 
@@ -22,15 +22,98 @@ function iso(daysFromNow: number) {
   return d.toISOString();
 }
 
-const base: Array<Partial<Campaign> & { name: string; code: string; type: CampaignType; status: CampaignStatus; totalSlots: number; filledSlots: number; startOffset: number; endOffset: number }> = [
-  { name: "Folheto Quinzenal Janeiro #02", code: "FQ-2025-02", type: "promotional_print", status: "filling", totalSlots: 80, filledSlots: 34, startOffset: 2, endOffset: 14 },
-  { name: "Encarte Verão Frutas & Verduras", code: "FLV-2025-V01", type: "seasonal", status: "open", totalSlots: 40, filledSlots: 5, startOffset: 7, endOffset: 21 },
-  { name: "Oportunidade Bebidas Carnaval", code: "OPP-2025-CRN", type: "opportunity", status: "review", totalSlots: 24, filledSlots: 24, startOffset: 10, endOffset: 20 },
-  { name: "Comercial Bazar Limpeza", code: "COM-2025-LL", type: "commercial", status: "approved", totalSlots: 32, filledSlots: 32, startOffset: -2, endOffset: 12 },
-  { name: "Estoque Higiene Encalhe", code: "EST-2025-H01", type: "stock", status: "draft", totalSlots: 18, filledSlots: 0, startOffset: 14, endOffset: 28 },
-  { name: "Regional Caeté Aniversário", code: "REG-2025-CT", type: "regional", status: "configured", totalSlots: 50, filledSlots: 0, startOffset: 21, endOffset: 35 },
-  { name: "App Exclusivo Fim de Semana", code: "APP-2025-04", type: "only_app", status: "exported", totalSlots: 16, filledSlots: 16, startOffset: -7, endOffset: 0 },
-  { name: "Digital Push Meio do Mês", code: "DIG-2025-MM", type: "digital", status: "filling", totalSlots: 28, filledSlots: 12, startOffset: 1, endOffset: 10 },
+const base: Array<
+  Partial<Campaign> & {
+    name: string;
+    code: string;
+    type: CampaignType;
+    status: CampaignStatus;
+    totalSlots: number;
+    filledSlots: number;
+    startOffset: number;
+    endOffset: number;
+  }
+> = [
+  {
+    name: "Folheto Quinzenal Janeiro #02",
+    code: "FQ-2025-02",
+    type: "promotional_print",
+    status: "filling",
+    totalSlots: 80,
+    filledSlots: 34,
+    startOffset: 2,
+    endOffset: 14,
+  },
+  {
+    name: "Encarte Verão Frutas & Verduras",
+    code: "FLV-2025-V01",
+    type: "seasonal",
+    status: "open",
+    totalSlots: 40,
+    filledSlots: 5,
+    startOffset: 7,
+    endOffset: 21,
+  },
+  {
+    name: "Oportunidade Bebidas Carnaval",
+    code: "OPP-2025-CRN",
+    type: "opportunity",
+    status: "review",
+    totalSlots: 24,
+    filledSlots: 24,
+    startOffset: 10,
+    endOffset: 20,
+  },
+  {
+    name: "Comercial Bazar Limpeza",
+    code: "COM-2025-LL",
+    type: "commercial",
+    status: "approved",
+    totalSlots: 32,
+    filledSlots: 32,
+    startOffset: -2,
+    endOffset: 12,
+  },
+  {
+    name: "Estoque Higiene Encalhe",
+    code: "EST-2025-H01",
+    type: "stock",
+    status: "draft",
+    totalSlots: 18,
+    filledSlots: 0,
+    startOffset: 14,
+    endOffset: 28,
+  },
+  {
+    name: "Regional Caeté Aniversário",
+    code: "REG-2025-CT",
+    type: "regional",
+    status: "configured",
+    totalSlots: 50,
+    filledSlots: 0,
+    startOffset: 21,
+    endOffset: 35,
+  },
+  {
+    name: "App Exclusivo Fim de Semana",
+    code: "APP-2025-04",
+    type: "only_app",
+    status: "exported",
+    totalSlots: 16,
+    filledSlots: 16,
+    startOffset: -7,
+    endOffset: 0,
+  },
+  {
+    name: "Digital Push Meio do Mês",
+    code: "DIG-2025-MM",
+    type: "digital",
+    status: "filling",
+    totalSlots: 28,
+    filledSlots: 12,
+    startOffset: 1,
+    endOffset: 10,
+  },
 ];
 
 export const mockCampaigns: Campaign[] = base.map((b, i) => ({

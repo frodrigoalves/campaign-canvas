@@ -15,10 +15,10 @@ export function NovoPMZCard({ result }: NovoPMZCardProps) {
     result?.status === "ok"
       ? "text-[var(--status-ok)]"
       : result?.status === "warn"
-      ? "text-[var(--status-warn)]"
-      : result?.status === "critical"
-      ? "text-[var(--status-critical)]"
-      : "text-[var(--text-tertiary)]";
+        ? "text-[var(--status-warn)]"
+        : result?.status === "critical"
+          ? "text-[var(--status-critical)]"
+          : "text-[var(--text-tertiary)]";
 
   return (
     <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-canvas)] p-3">

@@ -13,12 +13,7 @@ const OFFER_TYPES: PromotionalItem["offerType"][] = [
   "opportunity",
 ];
 
-const EXPOSURE_TYPES: PromotionalItem["exposureType"][] = [
-  "single",
-  "box",
-  "insert",
-  "highlight",
-];
+const EXPOSURE_TYPES: PromotionalItem["exposureType"][] = ["single", "box", "insert", "highlight"];
 
 const STATUSES: PromotionalItem["status"][] = ["pending", "filled", "review", "approved"];
 
@@ -31,10 +26,8 @@ export const mockPromotionalItems: PromotionalItem[] = Array.from({ length: 20 }
   const offerType = OFFER_TYPES[index % OFFER_TYPES.length];
   const exposureType = EXPOSURE_TYPES[index % EXPOSURE_TYPES.length];
   const buyer = buyers[index % buyers.length] ?? buyers[0];
-  const promotionalPrice = +(
-    product.commercial.salePrice * (0.78 + ((index % 5) * 0.04))
-  ).toFixed(2);
-  const pmzNew = Math.max(0, +(product.commercial.pmz - 0.25 + ((index % 4) * 0.12)).toFixed(2));
+  const promotionalPrice = +(product.commercial.salePrice * (0.78 + (index % 5) * 0.04)).toFixed(2);
+  const pmzNew = Math.max(0, +(product.commercial.pmz - 0.25 + (index % 4) * 0.12).toFixed(2));
   // determine margin and force some critical/warn cases for testing
   let offerMarginPercent = promotionalPrice
     ? +(((promotionalPrice - pmzNew) / promotionalPrice) * 100).toFixed(1)
@@ -46,11 +39,15 @@ export const mockPromotionalItems: PromotionalItem[] = Array.from({ length: 20 }
   if (criticalIndices.includes(index)) {
     // set promotional price below pmzNew to create negative margin
     const forcedPrice = +(pmzNew * 0.9).toFixed(2);
-    offerMarginPercent = forcedPrice ? +(((forcedPrice - pmzNew) / forcedPrice) * 100).toFixed(1) : 0;
+    offerMarginPercent = forcedPrice
+      ? +(((forcedPrice - pmzNew) / forcedPrice) * 100).toFixed(1)
+      : 0;
   } else if (warnIndices.includes(index)) {
     // set promotional price slightly above pmzNew to create a small margin (<5%)
     const forcedPrice = +(pmzNew * 1.02).toFixed(2) || promotionalPrice;
-    offerMarginPercent = forcedPrice ? +(((forcedPrice - pmzNew) / forcedPrice) * 100).toFixed(1) : 0;
+    offerMarginPercent = forcedPrice
+      ? +(((forcedPrice - pmzNew) / forcedPrice) * 100).toFixed(1)
+      : 0;
   }
 
   return {

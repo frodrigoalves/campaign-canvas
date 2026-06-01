@@ -150,13 +150,6 @@ export function LoginPage() {
                 <span>{serverError}</span>
               </div>
             )}
-
-            <div className="mt-6 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-3">
-              <div className="section-label mb-2 text-[10px]">Acesso demo</div>
-              <p className="text-[11px] leading-relaxed text-[var(--text-tertiary)]">
-                Qualquer email válido. Use a senha para escolher o papel: <span className="font-mono text-[var(--text-secondary)]">cevaroli</span> (admin), <span className="font-mono text-[var(--text-secondary)]">comprador</span>, <span className="font-mono text-[var(--text-secondary)]">marketing</span>, <span className="font-mono text-[var(--text-secondary)]">designer</span>.
-              </p>
-            </div>
           </form>
         </div>
       </section>

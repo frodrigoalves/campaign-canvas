@@ -34,7 +34,13 @@ export interface UpdateUserData {
   allowedCategories?: string[];
 }
 
-const auditEvents: Array<{ id: string; userId: string; action: string; description: string; createdAt: string }> = [
+const auditEvents: Array<{
+  id: string;
+  userId: string;
+  action: string;
+  description: string;
+  createdAt: string;
+}> = [
   {
     id: "audit-1",
     userId: "u-1",

@@ -18,6 +18,9 @@ import { usePermission } from "@/hooks/usePermission";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useRouter } from "@tanstack/react-router";
+
+interface NavItem {
+  label: string;
   icon: LucideIcon;
   to?: string;
   permission?: string;
@@ -34,13 +37,23 @@ const NAV: NavGroup[] = [
     items: [
       { label: "Campanhas", icon: LayoutGrid, to: "/campaigns", permission: "campaigns.view" },
       { label: "Compradores", icon: Users, permission: "buyers.monitor", comingSoon: true },
-      { label: "Estrutura Editorial", icon: Layers, permission: "editorial.manage", comingSoon: true },
+      {
+        label: "Estrutura Editorial",
+        icon: Layers,
+        permission: "editorial.manage",
+        comingSoon: true,
+      },
     ],
   },
   {
     label: "Conteúdo",
     items: [
-      { label: "Mesa do Comprador", icon: ShoppingBag, to: "/buyer-desk", permission: "buyer_desk.use" },
+      {
+        label: "Mesa do Comprador",
+        icon: ShoppingBag,
+        to: "/buyer-desk",
+        permission: "buyer_desk.use",
+      },
       { label: "Banco de Imagens", icon: ImageIcon, permission: "images.manage", comingSoon: true },
       { label: "Preview", icon: Eye, permission: "preview.view", comingSoon: true },
     ],
@@ -48,7 +61,12 @@ const NAV: NavGroup[] = [
   {
     label: "Aprovações",
     items: [
-      { label: "Aprovações", icon: CheckSquare, permission: "campaigns.approve_final", comingSoon: true },
+      {
+        label: "Aprovações",
+        icon: CheckSquare,
+        permission: "campaigns.approve_final",
+        comingSoon: true,
+      },
       { label: "Exportação", icon: Send, permission: "campaigns.release", comingSoon: true },
     ],
   },
@@ -70,7 +88,9 @@ export function Sidebar() {
 
   const visibleNav = NAV.map((group) => ({
     ...group,
-    items: group.items.filter((item) => !item.permission || item.permission === "*" || can(item.permission)),
+    items: group.items.filter(
+      (item) => !item.permission || item.permission === "*" || can(item.permission),
+    ),
   })).filter((group) => group.items.length > 0);
 
   const initials = (user?.name ?? "??")
@@ -104,8 +124,11 @@ export function Sidebar() {
             </div>
             <ul className="space-y-0.5">
               {group.items.map((item) => {
-                const isActive = item.to ? pathname === item.to || pathname.startsWith(item.to + "/") : false;
-                const disabled = item.comingSoon || (item.permission ? !can(item.permission) : false);
+                const isActive = item.to
+                  ? pathname === item.to || pathname.startsWith(item.to + "/")
+                  : false;
+                const disabled =
+                  item.comingSoon || (item.permission ? !can(item.permission) : false);
                 const baseClasses =
                   "group flex items-center gap-2.5 h-[38px] px-3 rounded-md text-[13px] transition-colors";
 
