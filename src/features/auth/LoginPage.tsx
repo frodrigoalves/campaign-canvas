@@ -15,10 +15,10 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-export function LoginPage({ redirectTo }: { redirectTo?: string }) {
+export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const setSession = useAuthStore((s) => s.setSession);
+  const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
 
   const {
@@ -34,8 +34,8 @@ export function LoginPage({ redirectTo }: { redirectTo?: string }) {
     setServerError(null);
     try {
       const { user, token } = await authService.login(values);
-      setSession(user, token);
-      navigate({ to: redirectTo ?? "/campaigns" });
+      login(user, token);
+      navigate({ to: "/campaigns" });
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Falha ao autenticar.");
     }
@@ -63,8 +63,8 @@ export function LoginPage({ redirectTo }: { redirectTo?: string }) {
             Grupo Cevaroli · Inteligência Promocional
           </p>
           <p className="mt-8 max-w-md text-sm leading-relaxed text-[var(--text-secondary)]">
-            Plataforma corporativa para orquestrar campanhas, folhetos e peças
-            digitais com margem controlada do início ao exporte.
+            Plataforma corporativa para orquestrar campanhas, folhetos e peças digitais com margem
+            controlada do início ao exporte.
           </p>
         </div>
         <span className="absolute bottom-6 left-16 z-10 font-mono text-[11px] text-[var(--text-tertiary)]">
@@ -114,11 +114,17 @@ export function LoginPage({ redirectTo }: { redirectTo?: string }) {
                   className="absolute inset-y-0 right-2 my-auto grid h-8 w-8 place-items-center rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
                   aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
-                  {showPassword ? <EyeOff size={15} strokeWidth={1.5} /> : <Eye size={15} strokeWidth={1.5} />}
+                  {showPassword ? (
+                    <EyeOff size={15} strokeWidth={1.5} />
+                  ) : (
+                    <Eye size={15} strokeWidth={1.5} />
+                  )}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-[12px] text-[var(--status-critical)]">{errors.password.message}</p>
+                <p className="text-[12px] text-[var(--status-critical)]">
+                  {errors.password.message}
+                </p>
               )}
               <div className="flex justify-end">
                 <button
@@ -148,11 +154,7 @@ export function LoginPage({ redirectTo }: { redirectTo?: string }) {
             <div className="mt-6 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-3">
               <div className="section-label mb-2 text-[10px]">Acesso demo</div>
               <p className="text-[11px] leading-relaxed text-[var(--text-tertiary)]">
-                Qualquer email válido. Use a senha para escolher o papel:{" "}
-                <span className="font-mono text-[var(--text-secondary)]">cevaroli</span> (admin),{" "}
-                <span className="font-mono text-[var(--text-secondary)]">comprador</span>,{" "}
-                <span className="font-mono text-[var(--text-secondary)]">marketing</span>,{" "}
-                <span className="font-mono text-[var(--text-secondary)]">comercial</span>.
+                Qualquer email válido. Use a senha para escolher o papel: <span className="font-mono text-[var(--text-secondary)]">cevaroli</span> (admin), <span className="font-mono text-[var(--text-secondary)]">comprador</span>, <span className="font-mono text-[var(--text-secondary)]">marketing</span>, <span className="font-mono text-[var(--text-secondary)]">designer</span>.
               </p>
             </div>
           </form>

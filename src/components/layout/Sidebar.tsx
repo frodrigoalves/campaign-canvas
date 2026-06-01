@@ -16,11 +16,8 @@ import {
 import { useAuthStore } from "@/lib/auth-store";
 import { usePermission } from "@/hooks/usePermission";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useRouter } from "@tanstack/react-router";
-
-interface NavItem {
-  label: string;
   icon: LucideIcon;
   to?: string;
   permission?: string;
@@ -66,7 +63,7 @@ const NAV: NavGroup[] = [
 
 export function Sidebar() {
   const user = useAuthStore((s) => s.user);
-  const clear = useAuthStore((s) => s.clear);
+  const logout = useAuthStore((s) => s.logout);
   const { can } = usePermission();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -84,7 +81,7 @@ export function Sidebar() {
     .toUpperCase();
 
   const handleLogout = () => {
-    clear();
+    logout();
     router.navigate({ to: "/login" });
   };
 
@@ -108,29 +105,41 @@ export function Sidebar() {
             <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const isActive = item.to ? pathname === item.to || pathname.startsWith(item.to + "/") : false;
+                const disabled = item.comingSoon || (item.permission ? !can(item.permission) : false);
                 const baseClasses =
                   "group flex items-center gap-2.5 h-[38px] px-3 rounded-md text-[13px] transition-colors";
-                if (item.comingSoon || !item.to) {
+
+                if (disabled) {
                   return (
                     <li key={item.label}>
-                      <button
-                        type="button"
-                        onClick={() => toast.info(`${item.label} estará disponível em breve.`)}
-                        className={cn(baseClasses, "w-full text-left text-[var(--text-tertiary)] hover:bg-[var(--bg-overlay)]/40")}
-                      >
-                        <item.icon size={16} strokeWidth={1.5} />
-                        <span className="flex-1">{item.label}</span>
-                        <span className="rounded-sm bg-[var(--bg-overlay)] px-1.5 py-px text-[9px] uppercase tracking-wider text-[var(--text-tertiary)]">
-                          em breve
-                        </span>
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className={cn(
+                              baseClasses,
+                              "w-full cursor-not-allowed text-left text-[var(--text-tertiary)] hover:bg-transparent",
+                            )}
+                          >
+                            <item.icon size={16} strokeWidth={1.5} />
+                            <span className="flex-1">{item.label}</span>
+                            <span className="rounded-sm bg-[var(--bg-overlay)] px-1.5 py-px text-[9px] uppercase tracking-wider text-[var(--text-tertiary)]">
+                              em breve
+                            </span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="rounded-md bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-default)]">
+                          Em breve
+                        </TooltipContent>
+                      </Tooltip>
                     </li>
                   );
                 }
+
                 return (
                   <li key={item.label}>
                     <Link
-                      to={item.to}
+                      to={item.to!}
                       className={cn(
                         baseClasses,
                         isActive

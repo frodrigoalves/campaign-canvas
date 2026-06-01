@@ -3,12 +3,9 @@ import { useAuthStore } from "@/lib/auth-store";
 import { AppShell } from "@/components/layout/AppShell";
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: ({ location }) => {
+  beforeLoad: () => {
     if (!useAuthStore.getState().isAuthenticated) {
-      throw redirect({
-        to: "/login",
-        search: { redirect: location.href },
-      });
+      throw redirect({ to: "/login" });
     }
   },
   component: AuthenticatedLayout,

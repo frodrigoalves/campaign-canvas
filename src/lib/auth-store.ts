@@ -6,8 +6,8 @@ interface AuthStore {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
-  setSession: (user: User, token: string) => void;
-  clear: () => void;
+  login: (user: User, token: string) => void;
+  logout: () => void;
 }
 
 const noopStorage = {
@@ -22,9 +22,8 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      setSession: (user, token) =>
-        set({ user, token, isAuthenticated: true }),
-      clear: () => set({ user: null, token: null, isAuthenticated: false }),
+      login: (user, token) => set({ user, token, isAuthenticated: true }),
+      logout: () => set({ user: null, token: null, isAuthenticated: false }),
     }),
     {
       name: "cevaroli.auth",

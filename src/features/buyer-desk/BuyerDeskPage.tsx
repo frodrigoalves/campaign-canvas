@@ -77,9 +77,15 @@ export function BuyerDeskPage() {
   const [seqError, setSeqError] = useState<string | null>(null);
   const [product, setProduct] = useState<ProductWithCommercial | null>(null);
   const [pmzResult, setPmzResult] = useState<PmzCalcResult | null>(null);
-  
 
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       descriptionNewspaper: "",
@@ -102,6 +108,9 @@ export function BuyerDeskPage() {
   const offerType = watch("offerType");
   const exposureType = watch("exposureType");
 
+  const deadline = new Date("2025-01-18");
+  const deadlineExpired = deadline.getTime() < Date.now();
+
   const charCount = description?.length ?? 0;
   const charWarn = charCount >= 50;
   const charError = charCount >= 70;
@@ -123,22 +132,27 @@ export function BuyerDeskPage() {
     }
   }
 
-  useEffect(() => {
-    if (!product || !promotionalPrice) {
-      setPmzResult(null);
-      return;
-    }
-    const t = setTimeout(async () => {
+  const calcPmz = async (price: number) => {
+    if (!product || price <= 0) return;
+    setCalcLoading(true);
+    try {
       const result = await promotionalItemsService.calculatePmz({
         pmz: product.commercial.pmz,
-        promotionalPrice,
+        promotionalPrice: price,
         sellOutValue: sellOutOn ? sellOutValue : 0,
         insertValue,
       });
       setPmzResult(result);
-    }, 250);
-    return () => clearTimeout(t);
-  }, [product, promotionalPrice, sellOutOn, sellOutValue, insertValue]);
+    } finally {
+      setCalcLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!product || !promotionalPrice) {
+      setPmzResult(null);
+    }
+  }, [product, promotionalPrice]);
 
   const onSubmit = async (_values: FormValues) => {
     await new Promise((r) => setTimeout(r, 400));
@@ -158,29 +172,35 @@ export function BuyerDeskPage() {
       ? promotionalPrice <= product.commercial.lowestCompetitorPrice90d
         ? "ok"
         : promotionalPrice <= product.commercial.lowestCompetitorPrice90d * 1.05
-        ? "warn"
-        : "critical"
+          ? "warn"
+          : "critical"
       : "warn"
     : null;
 
   return (
     <div className="space-y-6">
       {/* Context bar */}
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
+      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="font-display text-[18px] text-[var(--text-primary)]">{campaign.name}</div>
+            <div className="font-display text-[18px] text-[var(--text-primary)]">
+              {campaign.name}
+            </div>
             <div className="font-mono text-[11px] text-[var(--text-tertiary)]">{campaign.code}</div>
           </div>
-          <div className="text-[13px] text-[var(--text-secondary)]">
-            Slot 04 · Página 2 · Miolo
-          </div>
+          <div className="text-[13px] text-[var(--text-secondary)]">Slot 04 · Página 2 · Miolo</div>
           <div className="w-[180px] space-y-1">
             <ProgressBar value={3} max={6} />
-            <div className="font-mono text-[11px] text-[var(--text-secondary)]">3 de 6 itens preenchidos</div>
+            <div className="font-mono text-[11px] text-[var(--text-secondary)]">
+              3 de 6 itens preenchidos
+            </div>
           </div>
-          <div className="inline-flex items-center gap-1.5 font-mono text-[12px] text-[var(--status-warn)]">
-            <Clock size={13} strokeWidth={1.5} /> Prazo: 18 Jan 2025
+          <div
+            className={`inline-flex items-center gap-1.5 font-mono text-[13px] ${
+              deadlineExpired ? "text-[var(--status-critical)]" : "text-[var(--text-secondary)]"
+            }`}
+          >
+            <Clock size={14} strokeWidth={1.5} /> Prazo: 18 Jan 2025
           </div>
         </div>
       </div>
@@ -204,19 +224,27 @@ export function BuyerDeskPage() {
                 placeholder="00000000"
                 className={cn(
                   "h-14 w-full rounded-lg border-2 bg-[var(--bg-canvas)] px-5 pr-44 font-mono text-[18px] text-[var(--text-primary)] transition-all",
-                  seqError ? "border-[var(--status-critical)]" : "border-[var(--border-default)] focus:border-[var(--accent-primary)] focus:shadow-[var(--shadow-glow-blue)]",
+                  seqError
+                    ? "border-[var(--status-critical)]"
+                    : "border-[var(--border-default)] focus:border-[var(--accent-primary)] focus:shadow-[var(--shadow-glow-blue)]",
                   "outline-none",
                 )}
               />
               <div className="absolute inset-y-0 right-2 flex items-center gap-2">
-                <span className="font-mono text-[11px] text-[var(--text-tertiary)]">Enter p/ buscar</span>
+                <span className="font-mono text-[11px] text-[var(--text-tertiary)]">
+                  Enter p/ buscar
+                </span>
                 <button
                   type="submit"
                   disabled={loadingSeq}
                   className="grid h-10 w-10 place-items-center rounded-md bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] disabled:opacity-60"
                   aria-label="Buscar"
                 >
-                  {loadingSeq ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} strokeWidth={1.8} />}
+                  {loadingSeq ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <Search size={15} strokeWidth={1.8} />
+                  )}
                 </button>
               </div>
             </form>
@@ -226,7 +254,8 @@ export function BuyerDeskPage() {
               </p>
             )}
             <p className="text-[11px] text-[var(--text-tertiary)]">
-              Exemplo: <span className="font-mono">10000137</span> · ou tente um SEQ inválido para ver erro.
+              Exemplo: <span className="font-mono">10000137</span> · ou tente um SEQ inválido para
+              ver erro.
             </p>
           </div>
 
@@ -263,9 +292,14 @@ export function BuyerDeskPage() {
 
               <div className="flex items-center justify-between rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
                 <div>
-                  <div className="text-[13px] text-[var(--text-secondary)]">{product.commercial.competitorName}</div>
+                  <div className="text-[13px] text-[var(--text-secondary)]">
+                    {product.commercial.competitorName}
+                  </div>
                   <div className="font-mono text-[11px] text-[var(--text-tertiary)]">
-                    Pesquisa em {new Date(product.commercial.competitorResearchDate).toLocaleDateString("pt-BR")}
+                    Pesquisa em{" "}
+                    {new Date(product.commercial.competitorResearchDate).toLocaleDateString(
+                      "pt-BR",
+                    )}
                   </div>
                 </div>
                 <div className="font-mono text-[24px] text-[var(--text-primary)]">
@@ -275,12 +309,24 @@ export function BuyerDeskPage() {
                   className={cn(
                     "status-pill",
                     competitive === "ok" && "text-[var(--status-ok)] bg-[var(--status-ok-muted)]",
-                    competitive === "warn" && "text-[var(--status-warn)] bg-[var(--status-warn-muted)]",
-                    competitive === "critical" && "text-[var(--status-critical)] bg-[var(--status-critical-muted)]",
+                    competitive === "warn" &&
+                      "text-[var(--status-warn)] bg-[var(--status-warn-muted)]",
+                    competitive === "critical" &&
+                      "text-[var(--status-critical)] bg-[var(--status-critical-muted)]",
                   )}
                 >
-                  {competitive === "ok" ? <TrendingDown size={12} /> : competitive === "warn" ? <Minus size={12} /> : <TrendingUp size={12} />}
-                  {competitive === "ok" ? "Competitivo" : competitive === "warn" ? "Atenção" : "Não competitivo"}
+                  {competitive === "ok" ? (
+                    <TrendingDown size={12} />
+                  ) : competitive === "warn" ? (
+                    <Minus size={12} />
+                  ) : (
+                    <TrendingUp size={12} />
+                  )}
+                  {competitive === "ok"
+                    ? "Competitivo"
+                    : competitive === "warn"
+                      ? "Atenção"
+                      : "Não competitivo"}
                 </div>
               </div>
             </div>
@@ -293,7 +339,9 @@ export function BuyerDeskPage() {
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[12px] text-[var(--text-secondary)]">Descrição ERP (original)</label>
+                  <label className="text-[12px] text-[var(--text-secondary)]">
+                    Descrição ERP (original)
+                  </label>
                   <input
                     value={product.product.descriptionErp}
                     readOnly
@@ -301,7 +349,9 @@ export function BuyerDeskPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[12px] text-[var(--text-secondary)]">Descrição Jornal</label>
+                  <label className="text-[12px] text-[var(--text-secondary)]">
+                    Descrição Jornal
+                  </label>
                   <textarea
                     rows={2}
                     {...register("descriptionNewspaper")}
@@ -318,14 +368,20 @@ export function BuyerDeskPage() {
                     <span
                       className={cn(
                         "font-mono",
-                        charError ? "text-[var(--status-critical)]" : charWarn ? "text-[var(--status-warn)]" : "text-[var(--text-tertiary)]",
+                        charError
+                          ? "text-[var(--status-critical)]"
+                          : charWarn
+                            ? "text-[var(--status-warn)]"
+                            : "text-[var(--text-tertiary)]",
                       )}
                     >
                       {charCount}/70
                     </span>
                   </div>
                   {errors.descriptionNewspaper && (
-                    <p className="text-[11px] text-[var(--status-critical)]">{errors.descriptionNewspaper.message}</p>
+                    <p className="text-[11px] text-[var(--status-critical)]">
+                      {errors.descriptionNewspaper.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -353,19 +409,29 @@ export function BuyerDeskPage() {
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-[1fr_280px]">
                 <div className="space-y-1.5">
-                  <label className="text-[12px] text-[var(--text-secondary)]">Preço da Oferta</label>
+                  <label className="text-[12px] text-[var(--text-secondary)]">
+                    Preço da Oferta
+                  </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-[14px] text-[var(--text-tertiary)]">R$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-[14px] text-[var(--text-tertiary)]">
+                      R$
+                    </span>
                     <input
                       type="number"
                       step="0.01"
                       {...register("promotionalPrice")}
+                      onBlur={() => {
+                        const p = watch("promotionalPrice");
+                        if (p > 0) calcPmz(p);
+                      }}
                       className="ds-input h-12 pl-10 font-mono text-[20px]"
                       placeholder="0,00"
                     />
                   </div>
                   {errors.promotionalPrice && (
-                    <p className="text-[11px] text-[var(--status-critical)]">{errors.promotionalPrice.message}</p>
+                    <p className="text-[11px] text-[var(--status-critical)]">
+                      {errors.promotionalPrice.message}
+                    </p>
                   )}
                 </div>
 
@@ -387,7 +453,9 @@ export function BuyerDeskPage() {
               )}
 
               <div className="space-y-2">
-                <label className="text-[12px] text-[var(--text-secondary)]">Tipo de Exposição</label>
+                <label className="text-[12px] text-[var(--text-secondary)]">
+                  Tipo de Exposição
+                </label>
                 <div className="flex flex-wrap gap-2">
                   {EXPOSURE_TYPES.map((e) => (
                     <button
@@ -436,7 +504,9 @@ export function BuyerDeskPage() {
                   )}
                 </div>
                 <div className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3">
-                  <label className="block text-[12px] text-[var(--text-secondary)]">Valor Encarte / Box</label>
+                  <label className="block text-[12px] text-[var(--text-secondary)]">
+                    Valor Encarte / Box
+                  </label>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     <input
                       type="number"
@@ -461,7 +531,11 @@ export function BuyerDeskPage() {
                   disabled={isSubmitting}
                   className="inline-flex h-10 items-center gap-2 rounded-md bg-[var(--accent-primary)] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-60"
                 >
-                  {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} strokeWidth={1.5} />}
+                  {isSubmitting ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <CheckCircle size={14} strokeWidth={1.5} />
+                  )}
                   Salvar Item
                 </button>
                 <button
