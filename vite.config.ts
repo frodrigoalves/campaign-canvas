@@ -10,6 +10,9 @@ export default defineConfig({
   build: {
     outDir: "dist/client",
   },
+  preview: {
+    allowedHosts: ["cevaroli.auditsgl.online"],
+  },
   environments: {
     server: {
       build: {
